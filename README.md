@@ -3,6 +3,7 @@
 [![CI](https://github.com/kojix2/libbiosyntax/actions/workflows/ci.yml/badge.svg)](https://github.com/kojix2/libbiosyntax/actions/workflows/ci.yml)
 [![Lines of Code](https://img.shields.io/endpoint?url=https%3A%2F%2Ftokei.kojix2.net%2Fbadge%2Fgithub%2Fkojix2%2Flibbiosyntax%2Flines)](https://tokei.kojix2.net/github/kojix2/libbiosyntax)
 ![PURE VIBE CODING](https://img.shields.io/badge/PURE-VIBE_CODING-magenta)
+[![DOI](https://zenodo.org/badge/1269347617.svg)](https://doi.org/10.5281/zenodo.20691087)
 
 libbiosyntax is a small C99 reimplementation of
 [BioSyntax](https://github.com/bioSyntax/bioSyntax)'s biological text

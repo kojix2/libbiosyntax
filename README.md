@@ -1,8 +1,12 @@
 # libbiosyntax
 
-`libbiosyntax` is a small C99 tokenizer/highlighter core for biological text
-formats. It reads one text line at a time and returns byte spans with semantic
-token-class IDs.
+[![CI](https://github.com/kojix2/libbiosyntax/actions/workflows/ci.yml/badge.svg)](https://github.com/kojix2/libbiosyntax/actions/workflows/ci.yml)
+[![Lines of Code](https://img.shields.io/endpoint?url=https%3A%2F%2Ftokei.kojix2.net%2Fbadge%2Fgithub%2Fkojix2%2Flibbiosyntax%2Flines)](https://tokei.kojix2.net/github/kojix2/libbiosyntax)
+
+libbiosyntax is a small C99 reimplementation of
+[BioSyntax](https://github.com/bioSyntax/bioSyntax)'s biological text
+highlighting model. It reads one text line at a time and returns byte spans with
+semantic token-class IDs.
 
 It does not perform IO. Compressed or binary inputs such as BAM, CRAM, and BCF
 should be decoded by the caller before passing text lines to the core.

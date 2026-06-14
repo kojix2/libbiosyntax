@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  core:
+    name: core (${{ matrix.os }}, ${{ matrix.cc }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            cc: gcc
+          - os: ubuntu-latest
+            cc: clang
+          - os: macos-latest
+            cc: clang
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build library, tests, and plain-text example
+        env:
+          CC: ${{ matrix.cc }}
+        run: |
+          make
+          make test
+          make examples
+
+      - name: Smoke test bcat
+        run: |
+          printf 'chr1\t42\trs1\tA\tT\t99\tPASS\n' | build/bcat -f vcf > bcat.out
+          test -s bcat.out
+
+  biocat:
+    name: biocat with HTSlib
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install HTSlib
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libhts-dev pkg-config
+
+      - name: Build biocat
+        run: make biocat
+
+      - name: Smoke test biocat
+        run: |
+          printf '##fileformat=VCFv4.3\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\nchr1\t42\trs1\tA\tT\t99\tPASS\t.\n' > sample.vcf
+          build/biocat sample.vcf > biocat.out
+          test -s biocat.out
+
+  windows:
+    name: core (windows-latest, clang)
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build and test core
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force build
+          clang -DBIOSYN_STATIC -Iinclude -std=c99 -Wall -Wextra -pedantic tests/test_biosyntax.c src/biosyntax.c -o build/test_biosyntax.exe
+          .\build\test_biosyntax.exe

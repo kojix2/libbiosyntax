@@ -40,7 +40,11 @@ static int render_line(biosyn_state_t *state, const char *line, uint64_t len) {
         return 0;
     }
     biosyn_render_ansi_line(line, len, spans, span_count, out, out_len + 1u);
-    fputs(out, stdout);
+    if (fputs(out, stdout) == EOF) {
+        free(out);
+        if (spans != stack_spans) free(spans);
+        return 0;
+    }
 
     free(out);
     if (spans != stack_spans) free(spans);
@@ -95,6 +99,10 @@ int main(int argc, char **argv) {
     }
     if (ferror(fp)) {
         fprintf(stderr, "bcat: failed to read input\n");
+        rc = 1;
+    }
+    if (fflush(stdout) == EOF) {
+        fprintf(stderr, "bcat: failed to write output\n");
         rc = 1;
     }
 

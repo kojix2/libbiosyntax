@@ -120,7 +120,8 @@ static int next_input_line(input_stream_t *in, const char **line, size_t *len) {
 
     if (in->kind == INPUT_SAM) {
         ret = sam_read1(in->fp, in->sam_header, in->bam);
-        if (ret < 0) return 0;
+        if (ret == -1) return 0;
+        if (ret < -1) return -1;
         ks_clear(&in->line);
         if (sam_format1(in->sam_header, in->bam, &in->line) < 0) return -1;
         if (append_newline(&in->line) < 0) return -1;
@@ -131,7 +132,8 @@ static int next_input_line(input_stream_t *in, const char **line, size_t *len) {
 
     if (in->kind == INPUT_VCF) {
         ret = bcf_read(in->fp, in->bcf_header, in->bcf);
-        if (ret < 0) return 0;
+        if (ret == -1) return 0;
+        if (ret < -1) return -1;
         ks_clear(&in->line);
         if (vcf_format(in->bcf_header, in->bcf, &in->line) < 0) return -1;
         if (append_newline(&in->line) < 0) return -1;
@@ -141,7 +143,8 @@ static int next_input_line(input_stream_t *in, const char **line, size_t *len) {
     }
 
     ret = hts_getline(in->fp, '\n', &in->line);
-    if (ret < 0) return 0;
+    if (ret == -1) return 0;
+    if (ret < -1) return -1;
     if (append_newline(&in->line) < 0) return -1;
     *line = in->line.s;
     *len = in->line.l;
@@ -192,7 +195,9 @@ int main(int argc, char **argv) {
     }
 
     if (!open_input(path, fmt, &input)) {
-        perror(path);
+        fprintf(stderr, "biocat: failed to open or initialize input%s%s\n",
+            path ? ": " : "", path ? path : "");
+        close_input(&input);
         return 2;
     }
 
@@ -209,7 +214,11 @@ int main(int argc, char **argv) {
 
         line_status = next_input_line(&input, &line, &len);
         if (line_status == 0) break;
-        if (line_status < 0) { close_input(&input); return 1; }
+        if (line_status < 0) {
+            fprintf(stderr, "biocat: failed to read input\n");
+            close_input(&input);
+            return 1;
+        }
 
         need = biosyn_highlight_next_line(&state, line, len, spans, 256);
         if (need > 256) {
@@ -223,7 +232,13 @@ int main(int argc, char **argv) {
         rendered = (char *)malloc((size_t)rendered_need + 1u);
         if (!rendered) { if (spans != stack_spans) free(spans); close_input(&input); return 1; }
         biosyn_render_ansi_line(line, len, spans, need, rendered, rendered_need + 1);
-        fputs(rendered, stdout);
+        if (fputs(rendered, stdout) == EOF) {
+            free(rendered);
+            if (spans != stack_spans) free(spans);
+            close_input(&input);
+            fprintf(stderr, "biocat: failed to write output\n");
+            return 1;
+        }
         free(rendered);
         if (spans != stack_spans) free(spans);
     }
@@ -231,6 +246,10 @@ int main(int argc, char **argv) {
     if (close_input(&input) != 0) {
         fprintf(stderr, "biocat: input read failed\n");
         return 2;
+    }
+    if (fflush(stdout) == EOF) {
+        fprintf(stderr, "biocat: failed to write output\n");
+        return 1;
     }
     return 0;
 }

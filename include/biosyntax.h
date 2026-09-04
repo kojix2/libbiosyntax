@@ -4,7 +4,7 @@
 /*
  * libbiosyntax: dependency-free C tokenizer/highlighter core for biological files.
  * The core performs no IO; callers pass one already-read text line at a time.
- * SPDX-License-Identifier: GPL-3.0-only
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
 #include <stddef.h>

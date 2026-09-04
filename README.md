@@ -48,8 +48,12 @@ cc -Iinclude your_program.c src/biosyntax.c -o your_program
 
 ## License
 
-This implementation is inspired by BioSyntax and uses the same OSS license as
-the uploaded BioSyntax source tree: GNU General Public License version 3 only.
+This implementation is inspired by BioSyntax and is distributed under the GNU
+Lesser General Public License version 2.1 or later.
 See [LICENSE.md](LICENSE.md).
+
+This relicensing was made possible by the kind permission of BioSyntax's
+current owner and maintainer. See the
+[discussion in BioSyntax issue #70](https://github.com/bioSyntax/bioSyntax/issues/70#issuecomment-5496866713).
 
 Original BioSyntax project: <https://github.com/bioSyntax/bioSyntax>

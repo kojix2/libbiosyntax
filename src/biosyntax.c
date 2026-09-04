@@ -1,7 +1,7 @@
 
 /*
  * libbiosyntax: dependency-free C tokenizer/highlighter core for biological files.
- * SPDX-License-Identifier: GPL-3.0-only
+ * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 #define BIOSYN_BUILDING_LIBRARY
 #include "biosyntax.h"
